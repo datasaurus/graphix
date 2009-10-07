@@ -1,0 +1,18 @@
+#!/usr/bin/awk -f
+#
+#- colorx --
+#-	This script converts tiffino color table information,
+#-	from decimal color levels to hexadecimal.
+#
+# This command reads standard input, which should be output from 'tiffinfo -c'
+# applied to a tiff file which has paletized colors.
+#
+# tiffinfo is part of libtiff
+#
+# Copyright (c) 2009 Gordon D. Carrie
+# All rights reserved.
+
+
+/[0-9]+: +[0-9]+ +[0-9]+ +[0-9]+/ && ! /[0-9]+: +0+ +0+ +0+/ {
+    printf("%3d: %4x %4x %4x\n", $1, $2, $3, $4)
+}
