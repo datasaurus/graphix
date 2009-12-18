@@ -7,12 +7,13 @@
  .
  .	Please send feedback to dev0@trekix.net
  .
- .	$Revision: 1.10 $ $Date: 2009/12/17 20:47:34 $
+ .	$Revision: 1.1 $ $Date: 2009/12/18 20:39:15 $
  */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include "hsv_lib.h"
 
 int main(int argc, char *argv[])
