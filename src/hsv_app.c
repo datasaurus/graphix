@@ -7,7 +7,7 @@
  .
  .	Please send feedback to dev0@trekix.net
  .
- .	$Revision: 1.2 $ $Date: 2009/12/18 21:57:47 $
+ .	$Revision: 1.3 $ $Date: 2010/03/04 16:01:15 $
  */
 
 #include <stdlib.h>
@@ -89,7 +89,8 @@ int main(int argc, char *argv[])
     dh = (h1 - h0) / (n - 1);
     for (h = h0; n > 0; n--, h += dh) {
 	HSVtoRGB(&r, &g, &b, h, s, v);
-	printf("%lf %lf %lf\n", r, g, b);
+	printf("#%02x%02x%02x\n",
+		(unsigned)(r * 0xff), (unsigned)(g * 0xff), (unsigned)(b * 0xff));
     }
     return 0;
 }
