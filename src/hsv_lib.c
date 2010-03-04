@@ -38,7 +38,7 @@ void RGBtoHSV(double r, double g, double b, double *h, double *s, double *v)
     max = (r > g && r > b) ? r : (g > r && g > b) ? g : b;
     *v = max;				/* v */
     delta = max - min;
-    if (max != 0) {
+    if ( max != 0 ) {
 	*s = delta / max;		/* s */
     } else {
 	/* r = g = b = 0 */             /* s = 0, v is undefined */
@@ -46,15 +46,15 @@ void RGBtoHSV(double r, double g, double b, double *h, double *s, double *v)
 	*h = -1;
 	return;
     }
-    if (r == max) {
+    if ( r == max ) {
 	*h = (g - b) / delta;		/* between yellow & magenta */
-    } else if (g == max) {
+    } else if ( g == max ) {
 	*h = 2 + (b - r) / delta;	/* between cyan & yellow */
     } else {
 	*h = 4 + (r - g) / delta;	/* between magenta & cyan */
     *h *= 60;				/* degrees */
     }
-    if (*h < 0) {
+    if ( *h < 0 ) {
 	*h += 360;
     }
 }
@@ -64,7 +64,10 @@ void HSVtoRGB(double *r, double *g, double *b, double h, double s, double v)
     double i, f, p, q, t;
 
     h = fmod(h, 360.0);
-    if (s == 0) {
+    if ( h < 0.0 ) {
+	h += 360.0;
+    }
+    if ( s == 0 ) {
 	/* achromatic (grey) */
 	*r = *g = *b = v;
 	return;
