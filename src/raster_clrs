@@ -1,0 +1,53 @@
+#!/bin/sh
+#
+#-	raster_clrs --
+#-		Print a sequence of data boundaries and colors for
+#-		raster plotting. Data values increase uniformly.
+#-		Requires hsv application.
+#
+#	Copyright (c) 2010 Gordon D. Carrie
+#	All rights reserved.
+#
+#	$Revision: $ $Date: $
+#
+#	Usage: raster min max n_colors
+#
+#	Output:
+#		raster n_colors
+#		low_bound
+#		color
+#		bound
+#		color
+#		bound
+#		...
+#		bound
+#		color
+#		high_bound
+#
+#	Number of bounds will be n_colors + 1.
+
+if [ $# -ne 3 ]
+then
+    echo "Usage: raster min max n_colors"
+    exit 1
+fi
+min=$1
+max=$2
+n_clr=$3
+
+btmp=`mktemp`
+bc > $btmp << END
+scale = 4
+s = ($max - $min) / $n_clr
+if ( $max > $min ) {
+    for (d = $min; d <= $max; d += s) {print d, "\n"}
+}
+if ( $min > $max ) {
+    for (d = $min; d >= $max; d += s) {print d, "\n"}
+}
+END
+ctmp=`mktemp`
+echo "raster $n_clr"
+hsv 540 300 $n_clr > $ctmp
+paste $btmp $ctmp
+rm $btmp $ctmp
