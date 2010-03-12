@@ -8,7 +8,7 @@
 #	Copyright (c) 2010 Gordon D. Carrie
 #	All rights reserved.
 #
-#	$Revision: $ $Date: $
+#	$Revision: 1.1 $ $Date: 2010/03/08 22:17:09 $
 #
 #	Usage: raster min max n_colors
 #
@@ -35,6 +35,10 @@ min=$1
 max=$2
 n_clr=$3
 
+# Angles on hue color wheel
+h0=540
+h1=300
+
 btmp=`mktemp`
 bc > $btmp << END
 scale = 4
@@ -48,6 +52,6 @@ if ( $min > $max ) {
 END
 ctmp=`mktemp`
 echo "raster $n_clr"
-hsv 540 300 $n_clr > $ctmp
+hsv $h0 $h1 $n_clr > $ctmp
 paste $btmp $ctmp
 rm $btmp $ctmp
