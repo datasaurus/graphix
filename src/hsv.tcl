@@ -4,8 +4,7 @@ exec wish "$0" "$@"
 
 # This application displays a sequence of labels with colors specified in stdin,
 # which should be output from hsv.
-# Each input line must contain a "red green blue" specification for one color,
-# where the red, green, and blue values are floats in range [0,1].
+# Each input line must contain a specification for one color,
 
 set i 0
 while {[gets stdin c] >= 0} {
