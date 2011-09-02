@@ -4,13 +4,23 @@
 #-		Print a sequence of data boundaries and colors for
 #-		raster plotting. See raster_clrs (1).
 #
-#	Requires hsv, bighi, biglo, and biglrg applications.
+#	Requires hsv, bighi, biglo, bigsml, and biglrg applications.
 #
 #	Copyright (c) 2010 Gordon D. Carrie
 #	All rights reserved.
 #
-#	$Revision: 1.2 $ $Date: 2010/03/12 16:01:10 $
+#	$Revision: 1.3 $ $Date: 2011/09/02 20:19:30 $
 
+# Determine format for data values, by default, or -f argument
+fmt="%g"
+if [ $1 = "-f" ]
+then
+    shift
+    fmt=$1
+    shift
+fi
+
+# Parse rest of command line
 if [ $# -eq 3 ]
 then
     # raster_clrs min max n_colors
@@ -26,7 +36,7 @@ then
     n_clr=$3
     step=$4
 else
-    echo "Usage: raster_clrs min max n_colors [step]"
+    echo "Usage: raster_clrs -f format min max n_colors [step]"
     exit 1
 fi
 
@@ -34,47 +44,66 @@ fi
 h0=540
 h1=300
 
-btmp="/tmp/$0.$$.btmp"
-ctmp="/tmp/$0.$$.ctmp"
+# Create temporary files
+app_nm=`basename $0`
+btmp="/tmp/${app_nm}.$$.btmp"
+ctmp="/tmp/${app_nm}.$$.ctmp"
 trap "rm -f $btmp $ctmp" EXIT
 trap "rm -f $btmp $ctmp" QUIT
 trap "rm -f $btmp $ctmp" TERM
 touch $btmp $ctmp
+
+# Send data values to btmp file
 case $step in
     (uniform) {
-	bc > $btmp << END
-	scale = 4
-	s = ($max - $min) / $n_clr
-	if ( $max > $min ) {
-	    for (d = $min; d <= $max; d += s) {print d, "\n"}
-	}
-	if ( $min > $max ) {
-	    for (d = $min; d >= $max; d += s) {print d, "\n"}
-	}
-END
+	awk -v min=$min -v max=$max -v n_clr=$n_clr -v fmt=$fmt \
+		   'BEGIN {
+		       fmt = fmt "\n"
+			   s = (max - min) / n_clr
+			   if ( max > min ) {
+			       for (d = min; d <= max; d += s) {
+				   printf fmt, d
+			       }
+			   }
+		       if ( min > max ) {
+			   for (d = min; d >= max; d += s) {
+			       printf fmt, d
+			   }
+		       }
+		   }' > $btmp
     }
     ;; 
     (biglo) {
-	biglo $min $max ` expr $n_clr + 1` | awk '{print $2}' > $btmp
+	biglo $min $max ` expr $n_clr + 1` \
+	    | awk -v fmt=$fmt'\n' '{printf fmt, $2}' > $btmp
     }
     ;;
     (bighi) {
-	bighi $min $max ` expr $n_clr + 1` | awk '{print $2}' > $btmp
+	bighi $min $max ` expr $n_clr + 1` \
+	    | awk -v fmt=$fmt'\n' '{printf fmt, $2}' > $btmp
     }
     ;;
     (bigsml) {
-	bigsml $min $max ` expr $n_clr + 1` | awk '{print $2}' > $btmp
+	bigsml $min $max ` expr $n_clr + 1` \
+	    | awk -v fmt=$fmt'\n' '{printf fmt, $2}' > $btmp
     }
     ;;
     (biglrg) {
-	biglrg $min $max ` expr $n_clr + 1` | awk '{print $2}' > $btmp
+	biglrg $min $max ` expr $n_clr + 1` \
+	    | awk -v fmt=$fmt'\n' '{printf fmt, $2}' > $btmp
     }
     ;;
     (*) {
 	echo "$0: step must be one of biglo bighi bigsml biglrg"
-	exit 1
+	    exit 1
     }
 esac
+
+# Header
 echo "raster $n_clr"
+
+# Send color specifiers to ctmp file
 hsv $h0 $h1 $n_clr | awk '{print $5}' > $ctmp
+
+# Merge data values and color specifiers
 paste $btmp $ctmp
