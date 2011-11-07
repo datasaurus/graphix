@@ -9,16 +9,17 @@
 #	Copyright (c) 2010 Gordon D. Carrie
 #	All rights reserved.
 #
-#	$Revision: 1.3 $ $Date: 2011/09/02 20:19:30 $
+#	$Revision: 1.4 $ $Date: 2011/09/02 22:14:05 $
 
 # Determine format for data values, by default, or -f argument
 fmt="%g"
-if [ $1 = "-f" ]
+if [ $# -ge 3 -a "$1" = "-f" ]
 then
     shift
     fmt=$1
     shift
 fi
+fmt=${fmt}' '${fmt}'\n'
 
 # Parse rest of command line
 if [ $# -eq 3 ]
@@ -53,21 +54,35 @@ trap "rm -f $btmp $ctmp" QUIT
 trap "rm -f $btmp $ctmp" TERM
 touch $btmp $ctmp
 
+# This awk script prints a sequence of values as a sequence of min max pairs.
+min_max='
+BEGIN {
+    max = "none";
+}
+{
+    if ( max != "none" ) {
+	min = max;
+	max = $2;
+	printf fmt, min, max
+    } else {
+	max = $2
+    }
+}'
+
 # Send data values to btmp file
 case $step in
     (uniform) {
-	awk -v min=$min -v max=$max -v n_clr=$n_clr -v fmt=$fmt \
+	awk -v min=$min -v max=$max -v n_clr=$n_clr -v fmt="$fmt" \
 		   'BEGIN {
-		       fmt = fmt "\n"
-			   s = (max - min) / n_clr
-			   if ( max > min ) {
-			       for (d = min; d <= max; d += s) {
-				   printf fmt, d
-			       }
+		       s = (max - min) / n_clr
+		       if ( max > min ) {
+			   for (d = min; d < max; d += s) {
+			       printf fmt, d, d + s
 			   }
+		       }
 		       if ( min > max ) {
-			   for (d = min; d >= max; d += s) {
-			       printf fmt, d
+			   for (d = min; d > max; d += s) {
+			       printf fmt, d, d + s
 			   }
 		       }
 		   }' > $btmp
@@ -75,22 +90,22 @@ case $step in
     ;; 
     (biglo) {
 	biglo $min $max ` expr $n_clr + 1` \
-	    | awk -v fmt=$fmt'\n' '{printf fmt, $2}' > $btmp
+	    | awk -v fmt="$fmt" "$min_max" > $btmp
     }
     ;;
     (bighi) {
 	bighi $min $max ` expr $n_clr + 1` \
-	    | awk -v fmt=$fmt'\n' '{printf fmt, $2}' > $btmp
+	    | awk -v fmt="$fmt" "$min_max" > $btmp
     }
     ;;
     (bigsml) {
 	bigsml $min $max ` expr $n_clr + 1` \
-	    | awk -v fmt=$fmt'\n' '{printf fmt, $2}' > $btmp
+	    | awk -v fmt="$fmt" "$min_max" > $btmp
     }
     ;;
     (biglrg) {
 	biglrg $min $max ` expr $n_clr + 1` \
-	    | awk -v fmt=$fmt'\n' '{printf fmt, $2}' > $btmp
+	    | awk -v fmt="$fmt" "$min_max" > $btmp
     }
     ;;
     (*) {
@@ -106,4 +121,4 @@ echo "raster $n_clr"
 hsv $h0 $h1 $n_clr | awk '{print $5}' > $ctmp
 
 # Merge data values and color specifiers
-paste $btmp $ctmp
+paste $btmp $ctmp | awk '{print $1 " " $3 " " $2}'
