@@ -29,11 +29,13 @@
    .
    .	Please send feedback to dev0@trekix.net
    .
-   .	$Revision: 1.5 $ $Date: 2011/06/23 22:31:31 $
+   .	$Revision: 1.2 $ $Date: 2011/11/28 16:32:27 $
  */
 
 #ifndef HSV_H_
 #define HSV_H_
+
+#define HSV_VERSION "1.0"
 
 void RGBtoHSV(double r, double g, double b, double *h, double *s, double *v);
 void HSVtoRGB(double *r, double *g, double *b, double h, double s, double v);
