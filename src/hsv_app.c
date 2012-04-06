@@ -29,7 +29,7 @@
    .
    .	Please send feedback to dev0@trekix.net
    .
-   .	$Revision: 1.5 $ $Date: 2011/06/23 22:31:31 $
+   .	$Revision: 1.6 $ $Date: 2011/11/28 16:32:58 $
  */
 
 #include <stdlib.h>
@@ -80,7 +80,9 @@ int main(int argc, char *argv[])
 	n_s = argv[7];
     } else {
 	fprintf(stderr,
-		"Usage: %s [-s saturation] [-v value] hue0 hue1 n_colors\n", cmd);
+		"%s %s\n"
+		"Usage: %s [-s saturation] [-v value] hue0 hue1 n_colors\n",
+		cmd, HSV_VERSION, cmd);
 	exit(1);
     }
     if (s_s && (sscanf(s_s, "%lf", &s) != 1)) {
