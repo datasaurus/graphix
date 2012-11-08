@@ -29,7 +29,7 @@
    .
    .	Please send feedback to dev0@trekix.net
    .
-   .	$Revision: 1.6 $ $Date: 2011/11/28 16:32:58 $
+   .	$Revision: 1.7 $ $Date: 2012/04/06 21:01:04 $
  */
 
 #include <stdlib.h>
@@ -45,7 +45,8 @@ int main(int argc, char *argv[])
 					   end hue, and number of colors */
     char *s_s = NULL, *v_s = NULL;	/* Command line arguments for optional
 					   saturation and value */
-    double h0, h1, dh;			/* Initial hue, final hue, hue increment */
+    double h0, h1, dh;			/* Initial hue, final hue, hue
+					   increment */
     double h, s = 1.0, v = 1.0;		/* Hue, saturation, value */
     double r, g, b;			/* Output: red, green, blue values */
     int n;				/* Number of colors */
@@ -106,8 +107,8 @@ int main(int argc, char *argv[])
 	exit(1);
     }
     if (sscanf(n_s, "%d", &n) != 1) {
-	fprintf(stderr, "%s expected integer value for number of colors, got %s\n",
-		cmd, n_s);
+	fprintf(stderr, "%s expected integer value for number of colors, "
+		"got %s\n", cmd, n_s);
 	exit(1);
     }
     dh = (h1 - h0) / (n - 1);
@@ -115,7 +116,9 @@ int main(int argc, char *argv[])
 	HSVtoRGB(&r, &g, &b, h, s, v);
 	printf("%9.2f %9.2f %9.2f => #%02x%02x%02x\n",
 		h, s, v,
-		(unsigned)(r * 0xff), (unsigned)(g * 0xff), (unsigned)(b * 0xff));
+		(unsigned)(r * 0xff),
+		(unsigned)(g * 0xff),
+		(unsigned)(b * 0xff));
     }
     return 0;
 }
