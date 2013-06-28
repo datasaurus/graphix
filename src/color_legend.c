@@ -39,12 +39,13 @@
    .
    .	Please send feedback to dev0@trekix.net
    .
-   .	$Revision: $ $Date: $
+   .	$Revision: 1.1 $ $Date: 2013/05/29 17:13:05 $
  */
 
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 #define VERSION "1.0"
 
@@ -78,6 +79,7 @@ int main(int argc, char *argv[])
 				   print svg code which must be embedded
 				   in a svg document generated elsewhere. */
     unsigned n_clrs;		/* Number of colors */
+    unsigned n_vals;		/* Number of values = n_clrs + 1 */
     double width, height;	/* Width and height of the SVG viewport,
 				   SVG units */
     double font_sz;		/* Font size, SVG units */
@@ -88,12 +90,12 @@ int main(int argc, char *argv[])
 				   dimensioned [n_clrs]. */
     COLOR_NM *clr;		/* Color specifiers,
 				   dimensioned [n_clrs] */
+    unsigned lbl_len;		/* String length of label */
     unsigned lbl_max;		/* String length of longest label */
     double x, y;		/* SVG coordinates */
     double cell_ht;		/* Height of a color cell */
     int n;			/* Loop index */
-    int n_lbls;			/* Number of labels */
-    int skip;			/* Number of colors to skip from one label to
+    int dn;			/* Number of colors to skip from one label to
 				   next */
 
     font_color = "black";
@@ -140,16 +142,15 @@ int main(int argc, char *argv[])
 	exit(EXIT_FAILURE);
     }
 
-    /*
-       First line "raster n_clrs"
-     */
+    /* First line n_clrs */
 
     if ( scanf(" %u", &n_clrs) != 1 ) {
 	fprintf(stderr, "%s: could not find number of colors. First line of "
 		"input should be \"raster num_colors\"", cmd);
 	exit(EXIT_FAILURE);
     }
-    lbl = calloc(n_clrs, sizeof(*lbl));
+    n_vals = n_clrs + 1;
+    lbl = calloc(n_vals, sizeof(*lbl));
     clr = calloc(n_clrs, sizeof(*clr));
     if ( !lbl || !clr  ) {
 	fprintf(stderr, "%s: could not allocate memory for %u color "
@@ -157,13 +158,9 @@ int main(int argc, char *argv[])
 	exit(EXIT_FAILURE);
     }
 
-    /*
-       Rest of input "bound color bound color bound ..."
-     */
+    /* Rest of input "bound color bound color bound ..." */
 
     for (n = 0, lbl_max = 0; n < n_clrs; n++) {
-	unsigned lbl_len;		/* String length of label */
-
 	if ( scanf(" %" STR_MAX_S "s %" STR_MAX_S "s", lbl[n], clr[n]) != 2 ) {
 	    fprintf(stderr, "%s: read failed after %d entries.\n", cmd, n);
 	    exit(EXIT_FAILURE);
@@ -173,10 +170,16 @@ int main(int argc, char *argv[])
 	    lbl_max = lbl_len;
 	}
     }
+    if ( scanf(" %" STR_MAX_S "s", lbl[n]) != 1 ) {
+	fprintf(stderr, "%s: read failed after %d entries.\n", cmd, n);
+	exit(EXIT_FAILURE);
+    }
+    lbl_len = strlen(lbl[n]);
+    if ( lbl_len > lbl_max ) {
+	lbl_max = lbl_len;
+    }
 
-    /*
-       Print code for color legend.
-     */
+    /* If making a SVG element, print SVG header */
 
     if ( pr_hd ) {
 	printf(svg_head,
@@ -184,10 +187,13 @@ int main(int argc, char *argv[])
 		height + 1.5 * font_sz,
 		0.5 * font_sz, 0.5 * font_sz);
     }
+
+    /* Draw the rectangular color cells */
+
     cell_ht = height / n_clrs;
     x = 0;
     for (n = 0; n < n_clrs; n++) {
-	y = height - cell_ht * (n + 1);
+	y = height - (n + 1) * cell_ht;
 	printf("<rect x=\"%.1lf\" y=\"%.1lf\" "
 		"width=\"%.1lf\" height=\"%.1lf\" ",
 		x, y, width, cell_ht);
@@ -198,19 +204,39 @@ int main(int argc, char *argv[])
 	}
 	printf(" />\n");
     }
-    n_lbls = height / (font_sz * 2);
-    if ( n_lbls > n_clrs ) {
-	n_lbls = n_clrs;
-    }
-    skip = n_clrs / n_lbls;
-    x = width + font_sz;
+
+    /* Print the labels */
+
     printf("<g style=\"font-size: %.1lf;fill: %s\">\n", font_sz, font_color);
-    for (n = 0; n < n_clrs; n += skip) {
-	y = height - cell_ht * n - 0.5 * cell_ht;
+    x = width + font_sz;
+
+    /* Always print the first and last labels.  */
+
+    y = height;
+    printf("<text x=\"%.1lf\" y=\"%.1lf\""
+	    " dominant-baseline=\"middle\">%s</text>\n",
+	    x, y, lbl[0]);
+    y = 0.0;
+    printf("<text x=\"%.1lf\" y=\"%.1lf\""
+	    " dominant-baseline=\"middle\">%s</text>\n",
+	    x, y, lbl[(n_vals - 1)]);
+
+    /* Labels between first and last */
+
+    dn = ceil(2.0 * font_sz / cell_ht);
+    if ( dn < 1 ) {
+	dn = 1;
+    }
+    for (n = dn; n < n_vals - 1; n += dn) {
+	y = height - n * cell_ht;
 	printf("<text x=\"%.1lf\" y=\"%.1lf\""
 		" dominant-baseline=\"middle\">%s</text>\n", x, y, lbl[n]);
     }
+
     printf("</g>\n");
+
+    /* If making a SVG element, print SVG tail */
+
     if ( pr_hd ) {
 	printf("%s", svg_tail);
     }
