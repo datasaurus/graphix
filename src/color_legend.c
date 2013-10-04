@@ -39,7 +39,7 @@
    .
    .	Please send feedback to dev0@trekix.net
    .
-   .	$Revision: 1.1 $ $Date: 2013/05/29 17:13:05 $
+   .	$Revision: 1.2 $ $Date: 2013/06/28 22:39:14 $
  */
 
 #include <stdlib.h>
@@ -214,11 +214,11 @@ int main(int argc, char *argv[])
 
     y = height;
     printf("<text x=\"%.1lf\" y=\"%.1lf\""
-	    " dominant-baseline=\"middle\">%s</text>\n",
+	    " dominant-baseline=\"mathematical\">%s</text>\n",
 	    x, y, lbl[0]);
     y = 0.0;
     printf("<text x=\"%.1lf\" y=\"%.1lf\""
-	    " dominant-baseline=\"middle\">%s</text>\n",
+	    " dominant-baseline=\"mathematical\">%s</text>\n",
 	    x, y, lbl[(n_vals - 1)]);
 
     /* Labels between first and last */
@@ -230,7 +230,8 @@ int main(int argc, char *argv[])
     for (n = dn; n < n_vals - 1; n += dn) {
 	y = height - n * cell_ht;
 	printf("<text x=\"%.1lf\" y=\"%.1lf\""
-		" dominant-baseline=\"middle\">%s</text>\n", x, y, lbl[n]);
+		" dominant-baseline=\"mathematical\">%s</text>\n",
+		x, y, lbl[n]);
     }
 
     printf("</g>\n");
