@@ -39,7 +39,7 @@
    .
    .	Please send feedback to dev0@trekix.net
    .
-   .	$Revision: 1.2 $ $Date: 2013/06/28 22:39:14 $
+   .	$Revision: 1.4 $ $Date: 2014/01/24 22:42:49 $
  */
 
 #include <stdlib.h>
@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
 	lbl_max = lbl_len;
     }
 
-    /* If making a SVG element, print SVG header */
+    /* If making a SVG document, print SVG header */
 
     if ( pr_hd ) {
 	printf(svg_head,
@@ -212,14 +212,10 @@ int main(int argc, char *argv[])
 
     /* Always print the first and last labels.  */
 
-    y = height;
-    printf("<text x=\"%.1lf\" y=\"%.1lf\""
-	    " dominant-baseline=\"mathematical\">%s</text>\n",
-	    x, y, lbl[0]);
-    y = 0.0;
-    printf("<text x=\"%.1lf\" y=\"%.1lf\""
-	    " dominant-baseline=\"mathematical\">%s</text>\n",
-	    x, y, lbl[(n_vals - 1)]);
+    y = height + font_sz / 2.0;
+    printf("<text x=\"%.1lf\" y=\"%.1lf\">%s</text>\n", x, y, lbl[0]);
+    y = font_sz / 2.0;
+    printf("<text x=\"%.1lf\" y=\"%.1lf\">%s</text>\n", x, y, lbl[n_vals - 1]);
 
     /* Labels between first and last */
 
@@ -228,10 +224,8 @@ int main(int argc, char *argv[])
 	dn = 1;
     }
     for (n = dn; n < n_vals - 1; n += dn) {
-	y = height - n * cell_ht;
-	printf("<text x=\"%.1lf\" y=\"%.1lf\""
-		" dominant-baseline=\"mathematical\">%s</text>\n",
-		x, y, lbl[n]);
+	y = height - n * cell_ht + font_sz / 2.0;
+	printf("<text x=\"%.1lf\" y=\"%.1lf\">%s</text>\n", x, y, lbl[n]);
     }
 
     printf("</g>\n");
