@@ -9,9 +9,9 @@
 #	Copyright (c) 2010 Gordon D. Carrie
 #	All rights reserved.
 #
-#	$Revision: 1.6 $ $Date: 2012/09/14 18:09:34 $
+#	$Revision: 1.7 $ $Date: 2013/03/05 19:52:31 $
 
-# Determine format for data values, by default, or -f argument
+# Determine format for data values
 fmt="%g"
 if [ $# -ge 3 -a "$1" = "-f" ]
 then
@@ -24,20 +24,20 @@ fmt=${fmt}'\n'
 # Parse rest of command line
 if [ $# -eq 3 ]
 then
-    # raster_clrs min max n_colors
-    min=$1
-    max=$2
+    # raster_clrs bnd1 bnd2 n_colors
+    bnd1=$1
+    bnd2=$2
     n_clr=$3
     step="uniform"
 elif [ $# -eq 4 ]
 then
-    # raster_clrs min max n_colors step
-    min=$1
-    max=$2
+    # raster_clrs bnd1 bnd2 n_colors step
+    bnd1=$1
+    bnd2=$2
     n_clr=$3
     step=$4
 else
-    echo "Usage: raster_clrs -f format min max n_colors [step]"
+    echo "Usage: raster_clrs -f format bnd1 bnd2 n_colors [step]"
     exit 1
 fi
 
@@ -49,49 +49,41 @@ h1=300
 app_nm=`basename $0`
 btmp="/tmp/${app_nm}.$$.btmp"
 ctmp="/tmp/${app_nm}.$$.ctmp"
-trap "rm -f $btmp $ctmp" EXIT
-trap "rm -f $btmp $ctmp" QUIT
-trap "rm -f $btmp $ctmp" TERM
+trap "rm -f $btmp $ctmp" EXIT QUIT TERM KILL
 touch $btmp $ctmp
 
 # Send data values to btmp file
 case $step in
     (uniform) {
-	awk -v min=$min -v max=$max -v n_clr=$n_clr -v fmt="$fmt" \
+	awk -v bnd1=$bnd1 -v bnd2=$bnd2 -v n_clr=$n_clr -v fmt="$fmt" \
 		   'BEGIN {
-		       s = (max - min) / n_clr
-		       if ( max > min ) {
-			   for (d = min; d < max; d += s) {
-			       printf fmt, d
-			   }
-			   printf fmt, max
+		       s = (bnd2 - bnd1) / n_clr;
+		       d = bnd1;
+		       for (n = 0; n < n_clr; n++) {
+			   printf fmt, d;
+			   d += s;
 		       }
-		       if ( min > max ) {
-			   for (d = min; d > max; d += s) {
-			       printf fmt, d
-			   }
-			   printf fmt, max
-		       }
+		       printf fmt, bnd2;
 		   }' > $btmp
     }
     ;; 
     (biglo) {
-	biglo $min $max ` expr $n_clr + 1` \
+	biglo $bnd1 $bnd2 ` expr $n_clr + 1` \
 	    | awk '{printf "'$fmt'", $2}' > $btmp
     }
     ;;
     (bighi) {
-	bighi $min $max ` expr $n_clr + 1` \
+	bighi $bnd1 $bnd2 ` expr $n_clr + 1` \
 	    | awk '{printf "'$fmt'", $2}' > $btmp
     }
     ;;
     (bigsml) {
-	bigsml $min $max ` expr $n_clr + 1` \
+	bigsml $bnd1 $bnd2 ` expr $n_clr + 1` \
 	    | awk '{printf "'$fmt'", $2}' > $btmp
     }
     ;;
     (biglrg) {
-	biglrg $min $max ` expr $n_clr + 1` \
+	biglrg $bnd1 $bnd2 ` expr $n_clr + 1` \
 	    | awk '{printf "'$fmt'", $2}' > $btmp
     }
     ;;
