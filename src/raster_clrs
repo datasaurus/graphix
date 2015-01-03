@@ -9,7 +9,7 @@
 #	Copyright (c) 2010 Gordon D. Carrie
 #	All rights reserved.
 #
-#	$Revision: 1.7 $ $Date: 2013/03/05 19:52:31 $
+#	$Revision: 1.8 $ $Date: 2014/10/16 16:51:19 $
 
 # Determine format for data values
 fmt="%g"

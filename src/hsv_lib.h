@@ -29,7 +29,7 @@
    .
    .	Please send feedback to dev0@trekix.net
    .
-   .	$Revision: 1.2 $ $Date: 2011/11/28 16:32:27 $
+   .	$Revision: 1.3 $ $Date: 2012/04/06 21:01:42 $
  */
 
 #ifndef HSV_H_
