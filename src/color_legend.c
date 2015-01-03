@@ -1,18 +1,9 @@
 /*
    -	color_legend.c --
    -		This application prints SVG code for a color legend.
+   -		See color_legend (1).
    -	
    .	Copyright (c) 2011, Gordon D. Carrie. All rights reserved.
-   .
-   .	Usage:
-   .	color_legend [-h] width height font_sz [font_color]
-   .
-   .	x and y specify the SVG coordinates of the top left of the legend
-   .	width and height refer to the size of the color cells.
-   .	Color bar will be vertically stacked.
-   .	Labels will be to the right of the color bar.
-   .
-   .	Process reads output of raster_clrs program from standard input.
    .	
    .	Redistribution and use in source and binary forms, with or without
    .	modification, are permitted provided that the following conditions
